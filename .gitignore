@@ -1,2 +1,8 @@
 target/
 project/project/
+
+.history
+
+.bloop/
+.metals/
+project/metals.sbt
