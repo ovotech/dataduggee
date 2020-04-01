@@ -6,3 +6,5 @@ project/project/
 .bloop/
 .metals/
 project/metals.sbt
+
+.env

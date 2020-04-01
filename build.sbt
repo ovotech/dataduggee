@@ -3,6 +3,9 @@ val fs2Version = "2.2.2"
 val catsVersion = "2.1.0"
 val catsEffectVersion = "2.1.0"
 val scalatestVersion = "3.1.0"
+val scalacheckVersion = "1.14.3"
+val scalatestScalacheckVersion = "3.1.0.1"
+val circeVersion = "0.13.0"
 
 // Global / onLoad := (Global / onLoad).value.andThen { s =>
 //   dynverAssertTagVersion.value
@@ -20,7 +23,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "dataduggee",
     scalacOptions -= "-Xfatal-warnings",  // enable all options from sbt-tpolecat except fatal warnings
-    scalacOptions += "-target:jvm-1.9",
+    scalacOptions += "-target:jvm-1.8",
     libraryDependencies ++= List(
       "org.typelevel" %% "cats-macros" % catsVersion,
       "org.typelevel" %% "cats-kernel" % catsVersion,
@@ -33,5 +36,9 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-blaze-core" % http4sVersion,
       "org.http4s" %% "http4s-blaze-client" % http4sVersion,
       "org.scalatest" %% "scalatest" % scalatestVersion % Test,
+      "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test,
+      "org.scalatestplus" %% "scalacheck-1-14" % scalatestScalacheckVersion % Test,
+      "io.circe" %% "circe-parser" % circeVersion % Test,
+      "io.circe" %% "circe-core" % circeVersion % Test,
     )
   )

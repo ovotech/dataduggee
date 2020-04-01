@@ -1,6 +1,7 @@
 package com.filippodeluca.dataduggee
 
 import cats.implicits._
+import fs2._
 
 import model._
 import scala.concurrent.duration.FiniteDuration
@@ -44,7 +45,11 @@ object codec {
       }
 
       def encodeTags(tags: Set[String]) = {
-        """"tags":""" ++ tags.map(tag => s""""${tag}"""").mkString("[", ",", "]")
+        """"tags":""" ++ tags.map(tencodeTag).mkString("[", ",", "]")
+      }
+
+      def encodeTag(tag: Tag): String = {
+        tag.value.fold(s""""${tag.name}""""){value => s""""${tag.name}":"${value}""""}
       }
 
       def encodeHost(host: String) = s""""host":"${host}""""
@@ -73,5 +78,9 @@ object codec {
       case Rate(name, interval, points, host, tags) =>
         encodeMetric(name, points, "rate", interval.some, host, tags)
     }
+  }
+
+  def encodeMetrics[F[_]](metrics: Stream[F, Metric]): Stream[F, String] = {
+    Stream.emit("""{"series":[""") ++ metrics.map(codec.encodeMetric).intersperse(",") ++ Stream.emit("""]}""")
   }
 }
