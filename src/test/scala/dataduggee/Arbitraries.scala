@@ -30,10 +30,8 @@ object arbitraries {
   val genTag: Gen[Tag] = for {
     n <- choose(0, 3)
     tagName = s"test-dataduggee-tag-$n"
-    tagValueContent <- genNonEmptyString
-    tagValue <- arbitrary[Option[String]]
-    // FIXME: that's got to be a better way to gen an Option of a non empty string
-  } yield Tag(tagName, tagValue.map(_ => tagValueContent))
+    tagValue <- Gen.option(genNonEmptyString)
+  } yield Tag(tagName, tagValue)
 
   // Generate a instant between now and 30minutes ago
   implicit lazy val genInstant: Gen[Instant] = for {
