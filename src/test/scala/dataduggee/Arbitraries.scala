@@ -14,9 +14,24 @@ object arbitraries {
 
   implicit def genToArb[A: Gen]: Arbitrary[A] = Arbitrary(implicitly[Gen[A]])
 
+  def genStringOfSize(
+      genSize: Gen[Int] = Gen.choose(0, 24),
+      genChars: Gen[Char] = Gen.alphaNumChar
+  ): Gen[String] =
+    for {
+      size <- genSize
+      chars <- Gen.listOfN(size, genChars)
+    } yield chars.mkString
+
+  val genNonEmptyString: Gen[String] = genStringOfSize(
+    genSize = Gen.choose(1, 24)
+  )
+
   val genTag: Gen[Tag] = for {
     n <- choose(0, 3)
-  } yield Tag(s"phil-dataduggee-tag-${n}")
+    tagName = s"test-dataduggee-tag-$n"
+    tagValue <- Gen.option(genNonEmptyString)
+  } yield Tag(tagName, tagValue)
 
   // Generate a instant between now and 30minutes ago
   implicit lazy val genInstant: Gen[Instant] = for {
@@ -74,7 +89,32 @@ object arbitraries {
   )
 
   implicit lazy val genMetric: Gen[Metric] = oneOf(
-    genCount, genGauge, genRate
+    genCount,
+    genGauge,
+    genRate
+  )
+
+  implicit lazy val genEventPriority: Gen[Event.Priority] = oneOf(
+    Event.Priority.values
+  )
+
+  implicit lazy val genEventAlertType: Gen[Event.AlertType] = oneOf(
+    Event.AlertType.values
+  )
+
+  implicit lazy val genEvent: Gen[Event] = for {
+    title <- genNonEmptyString
+    text <- genNonEmptyString
+    priority <- arbitrary[Option[Event.Priority]]
+    alertType <- arbitrary[Event.AlertType]
+    noOfTags <- chooseNum(0, 3)
+    tags <- listOfN(noOfTags, genTag).map(_.toSet)
+  } yield Event(
+    title = title,
+    text = text,
+    priority = priority,
+    alertType = alertType,
+    tags = tags
   )
 
 }

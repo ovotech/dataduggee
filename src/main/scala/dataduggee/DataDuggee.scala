@@ -23,10 +23,12 @@ import scala.concurrent.ExecutionContext
 trait DataDuggee[F[_]] {
   def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit]
   def pipeMetrics(
-    maxMetrics: Int = 1024,
-    maxDelay: FiniteDuration = 10.seconds,
-    maxConcurrrency: Int = 512
+      maxMetrics: Int = 1024,
+      maxDelay: FiniteDuration = 10.seconds,
+      maxConcurrrency: Int = 512
   ): Pipe[F, Metric, Unit]
+
+  def createEvent(event: Event): F[Unit]
 }
 
 object DataDuggee {
@@ -45,6 +47,7 @@ object DataDuggee {
   def apply[F[_]: Concurrent: Timer](client: Client[F], config: Config) = new DataDuggee[F] with Http4sClientDsl[F] {
 
     val postMetricsUri = config.endpoint / "api" / "v1" / "series" +? ("api_key", config.apiKey)
+    val postEventUri = config.endpoint / "api" / "v1" / "events" +? ("api_key", config.apiKey)
 
     def pipeMetrics(
         maxMetrics: Int = 1024,
@@ -63,9 +66,18 @@ object DataDuggee {
 
       val response = for {
         req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
-        response <- client.successful[String](req)
+        response <- client.successful(req)
       } yield response
 
+      response.void
+    }
+
+    def createEvent(event: Event): F[Unit] = {
+      val body = codec.encodeEvent(event)
+      val response = for {
+        req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
+        resp <- client.successful(req)
+      } yield resp
       response.void
     }
   }
