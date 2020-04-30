@@ -40,5 +40,36 @@ lazy val root = (project in file("."))
       "org.scalatestplus" %% "scalacheck-1-14" % scalatestScalacheckVersion % Test,
       "io.circe" %% "circe-parser" % circeVersion % Test,
       "io.circe" %% "circe-core" % circeVersion % Test,
+      ),
+    commonSettings,
+    releaseOptions
+  )
+
+lazy val commonSettings = Seq(
+  startYear := Some(2019),
+  licenses := Seq(
+    "Apache-2.0" -> url("https://opensource.org/licenses/apache-2.0")
+  ),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/ovotech/dataduggee"),
+      "scm:git:git@github.com:ovotech/dataduggee.git"
     )
   )
+)
+
+lazy val releaseOptions = Seq(
+  releaseEarlyWith := BintrayPublisher,
+  releaseEarlyEnableSyncToMaven := false,
+  releaseEarlyNoGpg := true,
+  bintrayOrganization := Some("ovotech"),
+  bintrayRepository := "maven",
+  bintrayPackageLabels := Seq(
+    "cats",
+    "fs2",
+    "scala",
+    "datadog"
+  ),
+  version ~= (_.replace('+', '-')),
+  dynver ~= (_.replace('+', '-'))
+)
