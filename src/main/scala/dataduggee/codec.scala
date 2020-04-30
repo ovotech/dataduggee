@@ -14,7 +14,7 @@ object codec {
     * [[
     * { \"series\" :
     *    [{\"metric\":\"test.metric\",
-    *     \"points\":[[timestamp, 20]], 
+    *     \"points\":[[timestamp, 20]],
     *     \"type\":\"rate\",
     *     \"interval\": 20,
     *     \"host\":\"test.example.com\",
@@ -22,18 +22,17 @@ object codec {
     *   ]
     * }
     * ]]
-    * 
+    *
     * The timestamp must be in POSIX epoch (in seconds)
     */
   def encodeMetric(metric: Metric): String = {
-
     def encodeMetric(
         name: String,
         points: List[Point],
         typ: String,
         interval: Option[FiniteDuration],
         host: Option[String],
-        tags: Set[String]
+        tags: Set[Tag]
     ) = {
 
       def encodePoints(points: List[Point]) = {
@@ -42,14 +41,6 @@ object codec {
             s"""[${point.timestamp.getEpochSecond},${point.value}]"""
           }
           .mkString("[", ",", "]")
-      }
-
-      def encodeTags(tags: Set[String]) = {
-        """"tags":""" ++ tags.map(tencodeTag).mkString("[", ",", "]")
-      }
-
-      def encodeTag(tag: Tag): String = {
-        tag.value.fold(s""""${tag.name}""""){value => s""""${tag.name}":"${value}""""}
       }
 
       def encodeHost(host: String) = s""""host":"${host}""""
@@ -80,7 +71,33 @@ object codec {
     }
   }
 
+  def encodeTags(tags: Set[Tag]) = {
+    """"tags":""" ++ tags.map(encodeTag).mkString("[", ",", "]")
+  }
+
+  def encodeTag(tag: Tag): String = {
+    tag.value.fold(s""""${tag.name}"""") { value =>
+      s""""${tag.name}:${value}""""
+    }
+  }
+
   def encodeMetrics[F[_]](metrics: Stream[F, Metric]): Stream[F, String] = {
     Stream.emit("""{"series":[""") ++ metrics.map(codec.encodeMetric).intersperse(",") ++ Stream.emit("""]}""")
   }
+
+  def encodeEvent(event: Event) = {
+    def encodeTitle(title: String) = s""""title": "$title""""
+    def encodeText(text: String) = s""""text": "$text""""
+    def encodeAlertType(alertType: Event.AlertType) = s""""alert_type":"${alertType.value}""""
+    def encodePriority(priority: Event.Priority) = s""""priority":"${priority.value}""""
+
+   "{" ++ List(
+      encodeTitle(event.title).some,
+      encodeText(event.text).some,
+      event.priority.map(encodePriority),
+      encodeTags(event.tags).some,
+      encodeAlertType(event.alertType).some
+    ).flatten.mkString(",") ++ "}"
+  }
+
 }

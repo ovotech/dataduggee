@@ -3,16 +3,9 @@ package com.filippodeluca.dataduggee
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-
-import io.circe.parser.parse
-import fs2._
 import cats.effect._
-import cats.implicits._
-
 import model._
-import codec._
 import arbitraries._
-import org.scalacheck.Gen
 import scala.concurrent.ExecutionContext
 import cats.data.NonEmptyList
 
@@ -41,6 +34,12 @@ class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenProp
   "DataDuggee" should "submit a rate to DataDog" in forAll { rate: Rate =>
     DataDuggee.resource[IO](config).use { dd =>
       dd.sendMetrics(NonEmptyList.of(rate))
+    }.attempt.unsafeRunSync() shouldBe a[Right[_,_]]
+  }
+
+  "DataDuggee" should "create an event in DataDog" in forAll { event: Event =>
+    DataDuggee.resource[IO](config).use { dd =>
+      dd.createEvent(event)
     }.attempt.unsafeRunSync() shouldBe a[Right[_,_]]
   }
 
