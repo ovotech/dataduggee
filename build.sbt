@@ -27,6 +27,10 @@ lazy val dataduggee = (project in file("."))
         "scm:git:git@github.com:ovotech/dataduggee.git"
       )
     ),
+    // TODO Extract contributors from github
+    developers := List(
+      Developer("ovotech/comms", "OVO Comms team", "hello.comms@ovoenergy.com", url("https://github.com/orgs/ovotech/teams/comms")),
+    ),
     releaseEarlyWith := BintrayPublisher,
     releaseEarlyEnableSyncToMaven := false,
     releaseEarlyNoGpg := true,
