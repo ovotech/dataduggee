@@ -107,7 +107,7 @@ object codec {
     def encodeAlertType(alertType: Event.AlertType) = s""""alert_type":"${alertType.value}""""
     def encodePriority(priority: Event.Priority) = s""""priority":"${priority.value}""""
 
-   "{" ++ List(
+    "{" ++ List(
       encodeTitle(event.title).some,
       encodeText(event.text).some,
       event.priority.map(encodePriority),

@@ -78,10 +78,8 @@ jobs:
 
     - store_sbt_cache
 
-    - run: sbt headerCheck
+    - run: sbt headerCheckAll
     - run: sbt scalafmtCheckAll
-    # TODO Make sure scalafmtCheckAll checks it as well
-    - run: sbt it:scalafmtCheck
     
     - run: sbt +test:compile
 
@@ -91,10 +89,6 @@ jobs:
         - project/target
         - project/project/target
         - target
-        - modules/auth/target
-        - modules/common/target
-        - modules/dynamodb/target
-        - modules/s3/target
 
   unit_test:    
     executor: docker
