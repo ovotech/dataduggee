@@ -1,7 +1,0 @@
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.2.1")
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
-addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
-addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.7")
-addSbtPlugin("ch.epfl.scala" % "sbt-release-early" % "2.1.1")
-addSbtPlugin("au.com.onegeek" %% "sbt-dotenv" % "2.1.146")
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
