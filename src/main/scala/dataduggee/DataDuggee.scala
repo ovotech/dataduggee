@@ -82,7 +82,7 @@ object DataDuggee {
 
       val response = for {
         req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
-        response <- client.successful(req)
+        response <- client.successful(req).ensure(new Exception("Failed to send metric to DataDog."))(_ == true)
       } yield response
 
       response.void
@@ -92,7 +92,7 @@ object DataDuggee {
       val body = codec.encodeEvent(event)
       val response = for {
         req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
-        resp <- client.successful(req)
+        resp <- client.successful(req).ensure(new Exception("Failed to create event in DataDog."))(_ == true)
       } yield resp
       response.void
     }

@@ -34,6 +34,9 @@ class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenProp
   val config = DataDuggee.Config(
     apiKey = sys.env("DATADOG_API_KEY")
   )
+  val wrongConfig = DataDuggee.Config(
+    apiKey = "wrong"
+  )
 
   "DataDuggee" should "submit a gauge to DataDog" in forAll { gauge: Gauge =>
     DataDuggee
@@ -75,4 +78,25 @@ class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenProp
       .unsafeRunSync() shouldBe a[Right[_, _]]
   }
 
+  it should "fail when the createEvent HTTP response status is not a 2xx" in {
+    val event = genEvent.sample.get
+    DataDuggee
+      .resource[IO](wrongConfig)
+      .use { dd =>
+        dd.createEvent(event)
+      }
+      .attempt
+      .unsafeRunSync() shouldBe a[Left[Exception, _]]
+  }
+
+  it should "fail when the sendMetrics HTTP response status is not a 2xx" in {
+    val count = genCount.sample.get
+    DataDuggee
+      .resource[IO](wrongConfig)
+      .use { dd =>
+        dd.sendMetrics(NonEmptyList.of(count))
+      }
+      .attempt
+      .unsafeRunSync() shouldBe a[Left[Exception, _]]
+  }
 }
