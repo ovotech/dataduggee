@@ -17,34 +17,30 @@
 package com.filippodeluca.dataduggee
 
 import scala.concurrent.duration._
-
 import cats.data.NonEmptyList
 import cats.implicits._
 import cats.effect._
 import fs2._
-
 import model._
-
 import org.http4s.Method._
 import org.http4s.client._
 import org.http4s.syntax.all._
 import org.http4s.headers._
-
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.Uri
-import org.http4s.MediaType
+import org.http4s.{EntityBody, MediaType, Uri}
 import org.http4s.client.blaze.BlazeClientBuilder
+
 import scala.concurrent.ExecutionContext
 
 trait DataDuggee[F[_]] {
-  def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit]
+  def sendMetrics(metrics: NonEmptyList[Metric]): F[String]
   def pipeMetrics(
       maxMetrics: Int = 1024,
       maxDelay: FiniteDuration = 10.seconds,
       maxConcurrrency: Int = 512
-  ): Pipe[F, Metric, Unit]
+  ): Pipe[F, Metric, String]
 
-  def createEvent(event: Event): F[Unit]
+  def createEvent(event: Event): F[String]
 }
 
 object DataDuggee {
@@ -69,32 +65,38 @@ object DataDuggee {
         maxMetrics: Int = 1024,
         maxDelay: FiniteDuration = 10.seconds,
         maxConcurrrency: Int = 512
-    ): Pipe[F, Metric, Unit] = { in =>
+    ): Pipe[F, Metric, String] = { in =>
       in.groupWithin(maxMetrics, maxDelay)
         .mapAsync(maxConcurrrency) { xs =>
-          xs.toNel.fold(().pure[F])(sendMetrics)
+          xs.toNel.fold("".pure[F])(sendMetrics)
         }
     }
 
-    def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit] = {
-
+    def sendMetrics(metrics: NonEmptyList[Metric]): F[String] = {
       val body: Stream[F, String] = codec.encodeMetrics(Stream.emits(metrics.toList))
 
       val response = for {
         req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
-        response <- client.successful(req).ensure(new Exception("Failed to send metric to DataDog."))(_ == true)
+        response <- client.expectOr[String](req)(response => toStringException(response.body))
       } yield response
-
-      response.void
+      response
     }
 
-    def createEvent(event: Event): F[Unit] = {
+    def createEvent(event: Event): F[String] = {
       val body = codec.encodeEvent(event)
       val response = for {
         req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
-        resp <- client.successful(req).ensure(new Exception("Failed to create event in DataDog."))(_ == true)
-      } yield resp
-      response.void
+        response <- client.expectOr[String](req)(response => toStringException(response.body))
+      } yield response
+      response
     }
+
+    // TODO: Parse the DataDog error instead of just sending the whole JSON back as a String
+    private def toStringException(eb: EntityBody[F]): F[Throwable] =
+      eb.fold(new StringBuilder) { case (sb, b) => sb.append(b.toChar) }
+        .covary[F]
+        .compile
+        .lastOrError
+        .map(s => new Exception(s.toString))
   }
 }
