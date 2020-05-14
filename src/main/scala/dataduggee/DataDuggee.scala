@@ -74,21 +74,18 @@ object DataDuggee {
 
     def sendMetrics(metrics: NonEmptyList[Metric]): F[String] = {
       val body: Stream[F, String] = codec.encodeMetrics(Stream.emits(metrics.toList))
-
-      val response = for {
+      for {
         req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
         response <- client.expectOr[String](req)(response => toStringException(response.body))
       } yield response
-      response
     }
 
     def createEvent(event: Event): F[String] = {
       val body = codec.encodeEvent(event)
-      val response = for {
+      for {
         req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
         response <- client.expectOr[String](req)(response => toStringException(response.body))
       } yield response
-      response
     }
 
     // TODO: Parse the DataDog error instead of just sending the whole JSON back as a String
