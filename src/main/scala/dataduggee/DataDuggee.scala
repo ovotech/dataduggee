@@ -17,9 +17,11 @@
 package com.filippodeluca.dataduggee
 
 import scala.concurrent.duration._
+
 import cats.data.NonEmptyList
 import cats.implicits._
 import cats.effect._
+
 import fs2._
 import model._
 import org.http4s.Method._
@@ -27,10 +29,11 @@ import org.http4s.client._
 import org.http4s.syntax.all._
 import org.http4s.headers._
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.{EntityBody, MediaType, Uri}
+import org.http4s.{EntityBody, MediaType, Response, Uri}
 import org.http4s.client.blaze.BlazeClientBuilder
-
 import scala.concurrent.ExecutionContext
+
+import com.filippodeluca.dataduggee.error.RequestError
 
 trait DataDuggee[F[_]] {
   def sendMetrics(metrics: NonEmptyList[Metric]): F[String]
@@ -76,7 +79,7 @@ object DataDuggee {
       val body: Stream[F, String] = codec.encodeMetrics(Stream.emits(metrics.toList))
       for {
         req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
-        response <- client.expectOr[String](req)(response => toStringException(response.body))
+        response <- client.expectOr[String](req)(parseError)
       } yield response
     }
 
@@ -84,16 +87,21 @@ object DataDuggee {
       val body = codec.encodeEvent(event)
       for {
         req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
-        response <- client.expectOr[String](req)(response => toStringException(response.body))
+        response <- client.expectOr[String](req)(parseError)
       } yield response
     }
 
     // TODO: Parse the DataDog error instead of just sending the whole JSON back as a String
-    private def toStringException(eb: EntityBody[F]): F[Throwable] =
-      eb.fold(new StringBuilder) { case (sb, b) => sb.append(b.toChar) }
+    private def parseError(resp: Response[F]): F[Throwable] = {
+      val code = resp.status.code
+      resp.body
+        .fold(new StringBuilder) { case (sb, b) => sb.append(b.toChar) }
         .covary[F]
         .compile
         .lastOrError
-        .map(s => new Exception(s.toString))
+        .map { body =>
+          RequestError(code, body.toString)
+        }
+    }
   }
 }

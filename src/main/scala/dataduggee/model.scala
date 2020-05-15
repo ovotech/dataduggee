@@ -83,3 +83,11 @@ object model {
     }
   }
 }
+
+object error {
+  abstract class DataDuggeeError extends Exception
+
+  case class RequestError(code: Int, message: String) extends DataDuggeeError {
+    override def getMessage: String = message
+  }
+}
