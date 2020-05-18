@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.filippodeluca.dataduggee
+package com.ovoenergy.dataduggee
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

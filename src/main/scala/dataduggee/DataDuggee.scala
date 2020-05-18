@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package com.filippodeluca.dataduggee
+package com.ovoenergy.dataduggee
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 import cats.data.NonEmptyList
-import cats.implicits._
 import cats.effect._
+import cats.implicits._
 
 import fs2._
-import model._
 import org.http4s.Method._
 import org.http4s.client._
-import org.http4s.syntax.all._
-import org.http4s.headers._
-import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.{EntityBody, MediaType, Response, Uri}
 import org.http4s.client.blaze.BlazeClientBuilder
-import scala.concurrent.ExecutionContext
+import org.http4s.client.dsl.Http4sClientDsl
+import org.http4s.headers._
+import org.http4s.syntax.all._
+import org.http4s.{MediaType, Response, Uri}
 
-import com.filippodeluca.dataduggee.error.RequestError
+import com.ovoenergy.dataduggee.error.RequestError
+import model._
 
 trait DataDuggee[F[_]] {
   def sendMetrics(metrics: NonEmptyList[Metric]): F[String]
@@ -67,10 +67,10 @@ object DataDuggee {
     def pipeMetrics(
         maxMetrics: Int = 1024,
         maxDelay: FiniteDuration = 10.seconds,
-        maxConcurrrency: Int = 512
+        maxConcurrency: Int = 512
     ): Pipe[F, Metric, String] = { in =>
       in.groupWithin(maxMetrics, maxDelay)
-        .mapAsync(maxConcurrrency) { xs =>
+        .mapAsync(maxConcurrency) { xs =>
           xs.toNel.fold("".pure[F])(sendMetrics)
         }
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.filippodeluca.dataduggee
+package com.ovoenergy.dataduggee
 
 import java.time.Instant
 import scala.concurrent.duration._
