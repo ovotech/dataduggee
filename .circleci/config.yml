@@ -66,6 +66,7 @@ commands:
           git config user.name ovo-comms-circleci
           git config user.email "hello.comms@ovoenergy.com"     
 
+jobs:
   build_and_test:    
     executor: docker
     steps:
