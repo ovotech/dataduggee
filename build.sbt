@@ -36,7 +36,7 @@ lazy val dataduggee = (project in file("."))
       for {
         usr <- sys.env.get("ARTIFACTORY_USER")
         password <- sys.env.get("ARTIFACTORY_PASS")
-      } yield Credentials("Artifactory Realm", "kaluza.jfrog.io", usr, password)
+      } yield Credentials("Kaluza Artifactory", "kaluza.jfrog.io", usr, password)
     }.getOrElse(Credentials(Path.userHome / ".ivy2" / ".credentials")),
     version ~= (_.replace('+', '-')),
     dynver ~= (_.replace('+', '-')),

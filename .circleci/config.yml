@@ -66,25 +66,17 @@ commands:
           git config user.name ovo-comms-circleci
           git config user.email "hello.comms@ovoenergy.com"     
 
-jobs:
-  build:
-
+  build_and_test:    
     executor: docker
-
     steps:
-
     - checkout
-
     - restore_sbt_cache
-
     - run: sbt update
 
     - store_sbt_cache
 
     - run: sbt headerCheckAll
     - run: sbt scalafmtCheckAll
-    
-    - run: sbt +test:compile
 
     - persist_to_workspace:
         root: .
@@ -92,14 +84,6 @@ jobs:
         - project/target
         - project/project/target
         - target
-
-  unit_test:    
-    executor: docker
-    steps:
-    - checkout
-    - restore_sbt_cache
-    - attach_workspace:
-        at: .
 
     - run: sbt +test
 
@@ -145,16 +129,12 @@ workflows:
 
   main:
     jobs:
-    - build
-
-    - unit_test:
+    - build_and_test:
         context: comms-uat
-        requires:
-        - build
 
     - tag:
         requires:
-        - unit_test
+        - build_and_test
         filters:
           branches:
             only: master
