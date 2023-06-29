@@ -131,7 +131,9 @@ workflows:
   main:
     jobs:
     - build_and_test:
-        context: comms-uat
+        context: 
+          - comms-uat
+          - comms-internal-build
 
     - tag:
         requires:
