@@ -3,7 +3,10 @@ version: 2.1
 executors:
   docker:
     docker:
-    - image: circleci/openjdk:11-jdk
+    - image: cimg/openjdk:11.0
+      auth:
+        username: $OVO_DOCKERHUB_USER
+        password: $OVO_DOCKERHUB_PASSWORD
     environment:
       JAVA_OPTS: "-Xmx1g -XX:MaxMetaspaceSize=1g -XX:MetaspaceSize=1g -XX:+CMSClassUnloadingEnabled"
       DEFAULT_AWS_REGION: "eu-west-1"
