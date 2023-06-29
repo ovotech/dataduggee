@@ -131,9 +131,7 @@ workflows:
   main:
     jobs:
     - build_and_test:
-        context: 
-          - comms-uat
-          - comms-internal-build
+        context: comms-uat
 
     - tag:
         requires:
@@ -143,7 +141,9 @@ workflows:
             only: master
 
     - release:
-        context: comms-prd
+        context: 
+          - comms-prd
+          - comms-internal-build
         requires:
         - tag
 
