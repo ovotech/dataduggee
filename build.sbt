@@ -17,7 +17,7 @@ ThisBuild / dynverSeparator  := "-"
 lazy val dataduggee = (project in file("."))
   .settings(
     name := "dataduggee",
-    resolvers ++= List("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven"),
+    resolvers ++= List("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven/ovoenergy"),
     publishTo := Some("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven/ovoenergy"),
     startYear := Some(2019),
     licenses := Seq(
