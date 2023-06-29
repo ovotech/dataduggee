@@ -17,7 +17,7 @@ ThisBuild / dynverSeparator  := "-"
 lazy val dataduggee = (project in file("."))
   .settings(
     name := "dataduggee",
-    publishTo := Some("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven-private"),
+    publishTo := Some("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven"),
     startYear := Some(2019),
     licenses := Seq(
       "Apache-2.0" -> url("https://opensource.org/licenses/apache-2.0")
@@ -36,7 +36,7 @@ lazy val dataduggee = (project in file("."))
       for {
         usr <- sys.env.get("ARTIFACTORY_USER")
         password <- sys.env.get("ARTIFACTORY_PASS")
-      } yield Credentials("Kaluza Artifactory", "kaluza.jfrog.io", usr, password)
+      } yield Credentials("Artifactory Realm", "kaluza.jfrog.io", usr, password)
     }.getOrElse(Credentials(Path.userHome / ".ivy2" / ".credentials")),
     version ~= (_.replace('+', '-')),
     dynver ~= (_.replace('+', '-')),
