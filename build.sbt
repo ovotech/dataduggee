@@ -17,6 +17,8 @@ ThisBuild / dynverSeparator  := "-"
 lazy val dataduggee = (project in file("."))
   .settings(
     name := "dataduggee",
+    resolvers ++= List("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven"),
+    publishTo := Some("Kaluza Artifactory" at "https://kaluza.jfrog.io/artifactory/maven/ovoenergy"),
     startYear := Some(2019),
     licenses := Seq(
       "Apache-2.0" -> url("https://opensource.org/licenses/apache-2.0")
@@ -31,22 +33,11 @@ lazy val dataduggee = (project in file("."))
     developers := List(
       Developer("ovotech/comms", "OVO Comms team", "hello.comms@ovoenergy.com", url("https://github.com/orgs/ovotech/teams/comms")),
     ),
-    releaseEarlyWith := BintrayPublisher,
-    releaseEarlyEnableSyncToMaven := false,
-    releaseEarlyNoGpg := true,
-    bintrayOrganization := Some("ovotech"),
-    bintrayRepository := "maven",
-    bintrayPackageLabels := Seq(
-      "cats",
-      "fs2",
-      "scala",
-      "datadog"
-    ),
     credentials += {
       for {
-        usr <- sys.env.get("BINTRAY_USER")
-        password <- sys.env.get("BINTRAY_PASS")
-      } yield Credentials("Bintray", "dl.bintray.com", usr, password)
+        usr <- sys.env.get("ARTIFACTORY_USER")
+        password <- sys.env.get("ARTIFACTORY_PASS")
+      } yield Credentials("Artifactory Realm", "kaluza.jfrog.io", usr, password)
     }.getOrElse(Credentials(Path.userHome / ".ivy2" / ".credentials")),
     version ~= (_.replace('+', '-')),
     dynver ~= (_.replace('+', '-')),

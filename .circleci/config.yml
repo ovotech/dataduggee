@@ -135,7 +135,7 @@ jobs:
         at: .
     - restore_sbt_cache
     - run:
-        command: sbt +releaseEarly
+        command: sbt +publish
         no_output_timeout: 20m
 
 workflows:
