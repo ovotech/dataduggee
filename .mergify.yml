@@ -1,0 +1,29 @@
+queue_rules:
+  - name: default
+    merge_conditions:
+      - and:
+          - author=kaluza-libraries
+          - 'check-success=ci/circleci: build_and_test'
+pull_request_rules:
+  - name: Merge minor version PRs
+    conditions:
+      - author=kaluza-libraries
+      - body~=labels:.*semver-minor
+      - 'check-success=ci/circleci: build_and_test'
+    actions:
+      review:
+        type: APPROVE
+      queue:
+        name: default
+      delete_head_branch: {}
+  - name: Merge patch version PRs
+    conditions:
+      - author=kaluza-libraries
+      - body~=labels:.*semver-patch
+      - 'check-success=ci/circleci: build_and_test'
+    actions:
+      review:
+        type: APPROVE
+      queue:
+        name: default
+      delete_head_branch: {}
