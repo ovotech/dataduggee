@@ -3,12 +3,12 @@ version: 2.1
 executors:
   docker:
     docker:
-    - image: cimg/openjdk:11.0
+    - image: cimg/openjdk:17.0
       auth:
         username: $OVO_DOCKERHUB_USER
         password: $OVO_DOCKERHUB_PASSWORD
     environment:
-      JAVA_OPTS: "-Xmx1g -XX:MaxMetaspaceSize=1g -XX:MetaspaceSize=1g -XX:+CMSClassUnloadingEnabled"
+      JAVA_OPTS: "-Xmx1g -XX:MaxMetaspaceSize=1g -XX:MetaspaceSize=1g"
       DEFAULT_AWS_REGION: "eu-west-1"
       AWS_REGION: "eu-west-1"
 
