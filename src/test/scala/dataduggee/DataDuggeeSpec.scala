@@ -22,14 +22,11 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import cats.effect._
 import model._
 import arbitraries._
-import scala.concurrent.ExecutionContext
+
 import cats.data.NonEmptyList
+import cats.effect.unsafe.implicits.global
 
 class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
-  implicit val ec: ExecutionContext = ExecutionContext.global
-  implicit val timer: Timer[IO] = IO.timer(ec)
-  implicit val cs: ContextShift[IO] = IO.contextShift(ec)
 
   val config = DataDuggee.Config(
     apiKey = sys.env("DATADOG_API_KEY")

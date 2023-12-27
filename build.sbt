@@ -1,7 +1,8 @@
-val http4sVersion = "0.21.1"
-val fs2Version = "2.2.2"
+val http4sVersion = "0.23.24"
+val http4sBlazeClientVersion = "0.23.15"
+val fs2Version = "3.9.3"
 val catsVersion = "2.1.0"
-val catsEffectVersion = "2.1.0"
+val catsEffectVersion = "3.5.2"
 val scalatestVersion = "3.1.0"
 val scalacheckVersion = "1.14.3"
 val scalatestScalacheckVersion = "3.1.0.1"
@@ -51,8 +52,8 @@ lazy val dataduggee = (project in file("."))
       "co.fs2" %% "fs2-io" % fs2Version,
       "org.http4s" %% "http4s-core" % http4sVersion,
       "org.http4s" %% "http4s-client" % http4sVersion,
-      "org.http4s" %% "http4s-blaze-core" % http4sVersion,
-      "org.http4s" %% "http4s-blaze-client" % http4sVersion,
+      "org.http4s" %% "http4s-blaze-core" % http4sBlazeClientVersion,
+      "org.http4s" %% "http4s-blaze-client" % http4sBlazeClientVersion,
       "org.scalatest" %% "scalatest" % scalatestVersion % Test,
       "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test,
       "org.scalatestplus" %% "scalacheck-1-14" % scalatestScalacheckVersion % Test,
