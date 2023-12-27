@@ -60,8 +60,9 @@ object DataDuggee {
   }
   def apply[F[_]: Async](client: Client[F], config: Config) = new DataDuggee[F] with Http4sClientDsl[F] {
 
-    val postMetricsUri = config.endpoint / "api" / "v1" / "series" +? ("api_key", config.apiKey)
-    val postEventUri = config.endpoint / "api" / "v1" / "events" +? ("api_key", config.apiKey)
+    val postMetricsUri = (config.endpoint / "api" / "v1" / "series").withQueryParam("api_key", config.apiKey)
+
+    val postEventUri = (config.endpoint / "api" / "v1" / "events").withQueryParam("api_key", config.apiKey)
 
     def pipeMetrics(
         maxMetrics: Int = 1024,
