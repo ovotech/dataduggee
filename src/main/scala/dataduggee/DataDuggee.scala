@@ -33,8 +33,7 @@ import org.http4s.headers._
 import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.Uri
 import org.http4s.MediaType
-import org.http4s.client.blaze.BlazeClientBuilder
-import scala.concurrent.ExecutionContext
+import org.http4s.blaze.client.BlazeClientBuilder
 
 trait DataDuggee[F[_]] {
   def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit]
@@ -54,16 +53,16 @@ object DataDuggee {
       endpoint: Uri = uri"https://api.datadoghq.com"
   )
 
-  def resource[F[_]: ConcurrentEffect: Timer](
-      config: Config,
-      ec: ExecutionContext = ExecutionContext.global
+  def resource[F[_]: Async](
+      config: Config
   ): Resource[F, DataDuggee[F]] = {
-    BlazeClientBuilder[F](ec).resource.map(client => apply(client, config))
+    BlazeClientBuilder[F].resource.map(client => apply(client, config))
   }
-  def apply[F[_]: Concurrent: Timer](client: Client[F], config: Config) = new DataDuggee[F] with Http4sClientDsl[F] {
+  def apply[F[_]: Async](client: Client[F], config: Config) = new DataDuggee[F] with Http4sClientDsl[F] {
 
-    val postMetricsUri = config.endpoint / "api" / "v1" / "series" +? ("api_key", config.apiKey)
-    val postEventUri = config.endpoint / "api" / "v1" / "events" +? ("api_key", config.apiKey)
+    val postMetricsUri = (config.endpoint / "api" / "v1" / "series").withQueryParam("api_key", config.apiKey)
+
+    val postEventUri = (config.endpoint / "api" / "v1" / "events").withQueryParam("api_key", config.apiKey)
 
     def pipeMetrics(
         maxMetrics: Int = 1024,
@@ -79,22 +78,15 @@ object DataDuggee {
     def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit] = {
 
       val body: Stream[F, String] = codec.encodeMetrics(Stream.emits(metrics.toList))
+      val req = POST(body.through(fs2.text.utf8.encode), postMetricsUri, `Content-Type`(MediaType.application.json))
 
-      val response = for {
-        req <- POST(body.through(fs2.text.utf8Encode), postMetricsUri, `Content-Type`(MediaType.application.json))
-        response <- client.successful(req)
-      } yield response
-
-      response.void
+      client.successful(req).void
     }
 
     def createEvent(event: Event): F[Unit] = {
       val body = codec.encodeEvent(event)
-      val response = for {
-        req <- POST(body, postEventUri, `Content-Type`(MediaType.application.json))
-        resp <- client.successful(req)
-      } yield resp
-      response.void
+      val req = POST(body, postEventUri, `Content-Type`(MediaType.application.json))
+      client.successful(req).void
     }
   }
 }
