@@ -132,5 +132,4 @@ object arbitraries {
     alertType = alertType,
     tags = tags
   )
-
 }

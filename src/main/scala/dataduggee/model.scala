@@ -20,7 +20,6 @@ import java.time._
 import scala.concurrent.duration.FiniteDuration
 
 object model {
-
   case class Tag(name: String, value: Option[String])
 
   case class Point(timestamp: Instant, value: Float)

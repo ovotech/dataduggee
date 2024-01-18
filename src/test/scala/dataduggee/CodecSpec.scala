@@ -29,7 +29,6 @@ import arbitraries._
 import org.scalacheck.Gen
 
 class CodecSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
   "encodeMetric" should "produce a valid JSON object" in forAll(genMetric) { metric: Metric =>
     parse(encodeMetric(metric)) shouldBe a[Right[_, _]]
   }
@@ -42,5 +41,4 @@ class CodecSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenPropertyC
   "encodeEvent" should "produce a valid JSON object" in forAll { event: Event =>
     parse(encodeEvent(event)) shouldBe a[Right[_, _]]
   }
-
 }
