@@ -23,7 +23,6 @@ import model._
 import scala.concurrent.duration.FiniteDuration
 
 object codec {
-
   /**
     * It will generate a payload like this:
     *
@@ -50,7 +49,6 @@ object codec {
         host: Option[String],
         tags: Set[Tag]
     ) = {
-
       def encodePoints(points: List[Point]) = {
         """"points":""" ++ points
           .map { point =>
@@ -115,5 +113,4 @@ object codec {
       encodeAlertType(event.alertType).some
     ).flatten.mkString(",") ++ "}"
   }
-
 }
