@@ -27,7 +27,6 @@ import cats.data.NonEmptyList
 import cats.effect.unsafe.implicits.global
 
 class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
-
   val config = DataDuggee.Config(
     apiKey = sys.env("DATADOG_API_KEY")
   )
@@ -71,5 +70,4 @@ class DataDuggeeSpec extends AnyFlatSpec with Matchers with ScalaCheckDrivenProp
       .attempt
       .unsafeRunSync() shouldBe a[Right[_, _]]
   }
-
 }

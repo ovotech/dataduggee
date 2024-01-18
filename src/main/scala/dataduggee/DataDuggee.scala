@@ -47,7 +47,6 @@ trait DataDuggee[F[_]] {
 }
 
 object DataDuggee {
-
   case class Config(
       apiKey: String,
       endpoint: Uri = uri"https://api.datadoghq.com"
@@ -59,7 +58,6 @@ object DataDuggee {
     BlazeClientBuilder[F].resource.map(client => apply(client, config))
   }
   def apply[F[_]: Async](client: Client[F], config: Config) = new DataDuggee[F] with Http4sClientDsl[F] {
-
     val postMetricsUri = (config.endpoint / "api" / "v1" / "series").withQueryParam("api_key", config.apiKey)
 
     val postEventUri = (config.endpoint / "api" / "v1" / "events").withQueryParam("api_key", config.apiKey)
@@ -76,7 +74,6 @@ object DataDuggee {
     }
 
     def sendMetrics(metrics: NonEmptyList[Metric]): F[Unit] = {
-
       val body: Stream[F, String] = codec.encodeMetrics(Stream.emits(metrics.toList))
       val req = POST(body.through(fs2.text.utf8.encode), postMetricsUri, `Content-Type`(MediaType.application.json))
 
