@@ -4,7 +4,7 @@ val http4sBlazeClientVersion = "0.23.16"
 
 val fs2Version = "3.9.3"
 
-val catsVersion = "2.1.1"
+val catsVersion = "2.10.0"
 
 val catsEffectVersion = "3.5.2"
 
