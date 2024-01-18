@@ -6,7 +6,7 @@ val fs2Version = "3.9.3"
 
 val catsVersion = "2.1.1"
 
-val catsEffectVersion = "3.5.2"
+val catsEffectVersion = "3.5.3"
 
 val scalatestVersion = "3.1.0"
 
