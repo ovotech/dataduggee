@@ -23,8 +23,8 @@ import model._
 import scala.concurrent.duration.FiniteDuration
 
 object codec {
-  /**
-    * It will generate a payload like this:
+
+  /** It will generate a payload like this:
     *
     * [[
     * { \"series\" :
