@@ -1,4 +1,4 @@
-val http4sVersion = "0.23.25"
+val http4sVersion = "0.23.26"
 
 val http4sBlazeClientVersion = "0.23.16"
 
@@ -16,7 +16,7 @@ val scalatestScalacheckVersion = "3.1.0.1"
 
 val circeVersion = "0.13.0"
 
-ThisBuild / scalaVersion     := "2.13.12"
+ThisBuild / scalaVersion     := "2.13.13"
 ThisBuild / crossScalaVersions += "2.12.19"
 ThisBuild / organization     := "com.ovoenergy"
 ThisBuild / organizationName := "OVO energy"
