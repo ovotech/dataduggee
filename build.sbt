@@ -14,7 +14,7 @@ val scalacheckVersion = "1.14.3"
 
 val scalatestScalacheckVersion = "3.1.0.1"
 
-val circeVersion = "0.13.0"
+val circeVersion = "0.14.7"
 
 ThisBuild / scalaVersion     := "2.13.13"
 ThisBuild / crossScalaVersions += "2.12.19"
