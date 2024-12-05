@@ -1,4 +1,4 @@
-val http4sVersion = "0.23.29"
+val http4sVersion = "0.23.30"
 
 val http4sBlazeClientVersion = "0.23.17"
 
