@@ -16,7 +16,7 @@ val scalatestScalacheckVersion = "3.1.0.1"
 
 val circeVersion = "0.13.0"
 
-ThisBuild / scalaVersion     := "2.13.15"
+ThisBuild / scalaVersion     := "2.13.16"
 ThisBuild / crossScalaVersions += "2.12.20"
 ThisBuild / organization     := "com.ovoenergy"
 ThisBuild / organizationName := "OVO energy"
