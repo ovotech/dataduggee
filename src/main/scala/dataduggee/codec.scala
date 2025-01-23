@@ -16,7 +16,7 @@
 
 package com.filippodeluca.dataduggee
 
-import cats.implicits._
+import cats.syntax.all._
 import fs2._
 
 import model._
